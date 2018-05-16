@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace务必和接口的全类名一致 -->
+<mapper namespace="com.ltc.dao.UserMapper">
+    <!--id务必和接口中的方法名称对应如果参数类型是一个对象，那么sql语句中#｛对象的属性名｝-->
+    <insert id="addUser" parameterType="User">
+        INSERT into user (userName,passWord)
+        VALUES (#{userName},#{password})
+    </insert>
+
+
+    <insert id="addUserByCached" parameterType="User">
+        INSERT into user (userName,passWord)
+        VALUES (#{userName},#{password})
+        <selectKey resultType="int" keyProperty="userId" order="AFTER">
+            SELECT  @@IDENTITY
+        </selectKey>
+    </insert>
+
+    <!--删除操作  传递一个id不是一个对象 所以我们在sql语句中就可以用占位符-->
+    <delete id="deleteUser" parameterType="int">
+        delete from user where userId=#{XXX}
+    </delete>
+
+    <update id="updateUser" parameterType="User">
+        UPDATE user SET userName=#{userName},passWord=#{password}
+        WHERE  userId=#{userId}
+    </update>
+
+    <!--查询所有的user-->
+    <select id="selectAllUsers" resultType="User">
+        select * from user;
+    </select>
+    <!--查询所有的student  返回值是map
+         如果我们写的是resultType="map"
+         那么mybatis在底层会把我们的每个字段当成key
+         字段对象的值 是value！  这样不可行！
+         我们是想把某一个字段当成key!
+         整行数据（对象）当成value！
+         这时候就需要把resultType换成resultMap(结果映射)="映射的resultMap名称"
+         mybatis底层会进行拦截ResultSet!
+         然后根据我们在resultMap中的配置，
+         把对应的key和value封装到map集合中！
+       -->
+    <select id="selectAllByMap" resultMap="userMap">
+        select * from user;
+    </select>
+    <!--
+    01.数据库字段名和我们实体类属性名不一致   必须使用
+    02.返回结果是map集合时  必须使用
+    03.关联映射 以及延迟加载   必须使用
+  -->
+    <resultMap id="userMap" type="User">
+        <id property="userId" column="id"/> <!--只针对于主键的设置-->
+        <result property="userName" column="userName"/>  <!--设置除了主键，集合，对象之外的属性-->
+        <result property="password" column="passWord"/>
+    </resultMap>
+
+    <!--根据指定的id查询对象-->
+    <select id="selectUserStudentById" parameterType="int" resultType="User">
+        SELECT  * from user where id=#{xxx}
+    </select>
+
+    <!--根据学生name模糊查询
+     SELECT id,name,age FROM student  where name like '%' #{value} '%'
+    -->
+    <select id="selectByName" resultType="User">
+        select * from user where userName like concat('%',#{xxx},'%')
+    </select>
+</mapper>
