@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ltc.dao.StudentDao"> <!--必须是对应的dao接口的全类名-->
+
+
+    <!--
+        我们在前台表单中  有 三个输入框！
+        用户输入了几个？？？我们不知道
+        #{stuName}#{stuAge}
+        必须是map集合中的key
+
+        <select id="selectStudentByMap" resultType="Student">
+            SELECT id,name,age from student
+            where name like concat('%',#{stuName},'%')
+            and age>#{stuAge}
+        </select>
+    -->
+
+    <select id="selectStudentByMap" resultType="Student">
+        SELECT  id,name,age from student
+        where name like concat('%',#{stuName},'%')
+        and age>#{stuAge}
+        and id>#{student.id}
+    </select>
+
+
+    <!--使用索引-->
+    <select id="selectStudentsByCondition" resultType="Student">
+        SELECT id,name,age from student
+        where name like concat('%',#{0},'%')
+        and age>#{1}
+    </select>
+
+
+    <!--使用注解  #{name}  是Mapper接口中 @Param("name")  -->
+    <select id="findStudentByParams" resultType="Student">
+        SELECT id,`name`,age from student
+        where name like '%' #{name} '%'
+        and id > #{id}
+    </select>
+
+</mapper>
